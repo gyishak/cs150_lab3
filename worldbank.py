@@ -48,16 +48,13 @@ app.layout = dbc.Container(
                 [
                     html.H1(
                         "Comparison of World Bank Country Data",
-
                         style={"textAlign": "center"},
                     ),
                     html.H2(
                         datetime.now(),
                         style={"textAlign": "center"},
                     ),
-
                     dcc.Graph(id="my-choropleth", figure={}),
-
                 ],
                 width=12,
             )
@@ -75,13 +72,10 @@ app.layout = dbc.Container(
                         id="my-dropdown",
                         options=[{"label": i, "value": i} for i in indicators.values()],
                         value=list(indicators.values())[0],
-                        # inputClassName="me-2",
                     ),
                 ],
                 width=4,
-
-            )
-            ,
+            ),
             dbc.Col(
                 [
                     dbc.Label(
@@ -110,7 +104,6 @@ app.layout = dbc.Container(
                             2016: "2016",
                         },
                     ),
-
                 ],
                 width=6,
             ),
@@ -120,26 +113,35 @@ app.layout = dbc.Container(
                 dbc.Button(
                     id="my-button",
                     children="Submit",
-                    # n_clicks= 0,
                     color="primary",
-                    # className="d-flex justify-content-end bg- border mb-2"
-                    className="fw-bold d-flex justify-content-end"
                 ),
             ],
                 width=12,
+                className="fw-bold d-flex justify-content-end"
             )],
-        )
-        ,
+        ),
+        dbc.Row([dbc.Col([html.Div(
+                    id="clicked_times",
+                    children="Clicks:",
+                    style={"textAlign": "left"},
+       )])]
+        ),
         dcc.Store(id="storage", storage_type="session", data={}),
         dcc.Interval(id="timer", interval=1000 * 60, n_intervals=0),
     ]
 )
 
-
 @app.callback(Output("storage", "data"), Input("timer", "n_intervals"), )
 def store_data(n_time):
     dataframe = update_wb_data()
     return dataframe.to_dict("records")
+
+@app.callback(Output("clicked_times", "children"), Input("my-button", "n_clicks"), )
+def store_time(n_clicks):
+    if n_clicks is not None:
+        return f'Clicks: {n_clicks}'
+    else:
+        return f'Clicks: {n_clicks}'
 
 
 @app.callback(
@@ -152,8 +154,8 @@ def store_data(n_time):
 def update_graph(n_clicks, stored_dataframe, years_chosen, indct_chosen):
     dff = pd.DataFrame.from_records(stored_dataframe)
     print(years_chosen)
-    # n_clicks = n_clicks + 1
-    # print(n_clicks)
+
+    print(n_clicks)
 
     if years_chosen[0] != years_chosen[1]:
         dff = dff[dff.year.between(years_chosen[0], years_chosen[1])]
